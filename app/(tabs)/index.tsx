@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 
 type RecentSession = {
   id: string;
@@ -65,28 +68,61 @@ export default function HomeScreen() {
 
 
   const [recentSessions, setRecentSessions] = useState<RecentSession[]>([]);
+  
+  // Blinking cursor animation
+  const cursorOpacity = useSharedValue(1);
+  
+  useEffect(() => {
+    cursorOpacity.value = withRepeat(
+      withTiming(0, { duration: 500 }),
+      -1,
+      true
+    );
+  }, []);
+
+  const animatedCursorStyle = useAnimatedStyle(() => {
+    return {
+      opacity: cursorOpacity.value,
+    };
+  });
 
   return (
     <View style={styles.Container}>
-      <Text style={styles.text}>
+      {recentSessions.length > 0 && (<Text style={styles.text}>
         Recent sessions{'\n'}
-        ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ{'\n'}
+        ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ{'\n'}
         {recentSessions.map((session: any) => (
           <Text key={session.id} style={styles.text}>{session.date} - {session.notes} notes logged{'\n'}</Text>
         ))}
-        ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ{'\n'}
-        </Text>
-        <Text style={styles.centerTextContainer}>[
-          {' '}<Text style={styles.startWord}>Start</Text> {''}
-          <Text style={styles.newWord}>new</Text> {''}
-          <Text style={styles.sessionWord}>session</Text>{' '}]
+        ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ{'\n'}
+        </Text>)}
+        <Pressable 
+          onPress={() => router.push('/new-session')}
+          onPressIn={() => {
+            if (Platform.OS === 'ios') {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }
+          }}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          style={({ pressed }) => [
+            styles.buttonContainer,
+            pressed && styles.buttonPressed
+          ]}
+        >
+          <Text style={styles.centerContainer}>
+            $ <Text style={styles.promptText}>[</Text>
+            <Text style={styles.startWord}>Start</Text>{' '}
+            <Text style={styles.newWord}>new</Text>{' '}
+            <Text style={styles.sessionWord}>session</Text>
+            <Text style={styles.promptText}>]</Text>
+            <Animated.Text style={[styles.cursor, animatedCursorStyle]}>_</Animated.Text>
           </Text>
-
+        </Pressable>
         {/* overlap background art and fractal logo */}
         <View style={styles.overlapContainer}>
           <Text style={styles.backgroundArt}>{backgroundArt}</Text>
           <Text style={styles.fractalLogo}>{fractalLogo}</Text>
-        </View>
+          </View>
     </View>
   );
 }
@@ -107,35 +143,59 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontFamily: 'Ubuntu-Regular',
   },
-  centerTextContainer: {
+  centerContainer: {
     textAlign: 'center',
     color: "white",
+    fontFamily: 'Ubuntu-Regular',
   },
   overlapContainer: {
     position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   backgroundArt: {
     fontFamily: 'Ubuntu-Regular',
     fontSize: 8,
     lineHeight: 8,
     color: "#737373",
+    textAlign: 'center',
   },
   fractalLogo: {
     position: 'absolute',
-    top: 0,
-    left: 0,
     color: "white",
     fontSize: 8,
     lineHeight: 8,
     fontFamily: 'Ubuntu-Regular',
+    textAlign: 'center',  
+    textAlignVertical: 'center',
   },
   startWord: {
-    color: "#4ECDC4", // Red color for "Start"
+    color: "#4ECDC4", 
+    fontFamily: 'Ubuntu-Regular',
   },
   newWord: {
-    color: "#FFE66D", // Teal color for "new"
+    color: "#FFE66D", 
+    fontFamily: 'Ubuntu-Regular',
   },
   sessionWord: {
-    color: "#4ECDC4", // Yellow color for "session"
+    color: "#4ECDC4", 
+    fontFamily: 'Ubuntu-Regular',
+  },
+  buttonContainer: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  buttonPressed: {
+    backgroundColor: 'rgba(78, 205, 196, 0.1)',
+    transform: [{ scale: 0.98 }],
+  },
+  promptText: {
+    color: '#737373',
+    fontFamily: 'Ubuntu-Regular',
+  },
+  cursor: {
+    color: '#4ECDC4',
+    fontFamily: 'Ubuntu-Regular',
   },
 });
