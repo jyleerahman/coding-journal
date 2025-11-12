@@ -1,5 +1,11 @@
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+type RecentSession = {
+  id: string;
+  date: string;
+  notes: number;
+}
 
 export default function HomeScreen() {
   const backgroundArt = `
@@ -33,7 +39,7 @@ export default function HomeScreen() {
   `
 
   const fractalLogo = `
-  8888888888                       888             888     
+  88888888                       888             888     
 888                              888             888     
 888                              888             888     
 8888888 888d888 8888b.   .d8888b 888888  8888b.  888     
@@ -57,18 +63,26 @@ export default function HomeScreen() {
 888P"                                                    
   `
 
+
+  const [recentSessions, setRecentSessions] = useState<RecentSession[]>([]);
+
   return (
     <View style={styles.Container}>
-      <Text style={styles.text}>Recent sessions {'\n'}
-      {'\n'}
-        ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-        {'\n'}
-        Tue, Nov 12 - 3 notes logged{'\n'}
-        Mon, Nov 11 - 5 notes logged{'\n'}
-        Sun, Nov 10 - 2 notes logged{'\n'}
-        {'\n'}
-        ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ{'\n'}</Text>
-        <Text style={styles.text}>[Start new session]</Text>
+      <Text style={styles.text}>
+        Recent sessions{'\n'}
+        ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ{'\n'}
+        {recentSessions.map((session: any) => (
+          <Text key={session.id} style={styles.text}>{session.date} - {session.notes} notes logged{'\n'}</Text>
+        ))}
+        ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ{'\n'}
+        </Text>
+        <Text style={styles.centerTextContainer}>[
+          {' '}<Text style={styles.startWord}>Start</Text> {''}
+          <Text style={styles.newWord}>new</Text> {''}
+          <Text style={styles.sessionWord}>session</Text>{' '}]
+          </Text>
+
+        {/* overlap background art and fractal logo */}
         <View style={styles.overlapContainer}>
           <Text style={styles.backgroundArt}>{backgroundArt}</Text>
           <Text style={styles.fractalLogo}>{fractalLogo}</Text>
@@ -81,7 +95,11 @@ const styles = StyleSheet.create({
   Container: {
     backgroundColor: "#353935",
     height: "100%",
-    padding: 16,
+    padding: 20,
+    paddingTop:40,
+    gap: 16,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
   text: {
     color: "white",
@@ -89,13 +107,17 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontFamily: 'Ubuntu-Regular',
   },
+  centerTextContainer: {
+    textAlign: 'center',
+    color: "white",
+  },
   overlapContainer: {
     position: 'relative',
   },
   backgroundArt: {
     fontFamily: 'Ubuntu-Regular',
-    fontSize: 12,
-    lineHeight: 12,
+    fontSize: 8,
+    lineHeight: 8,
     color: "#737373",
   },
   fractalLogo: {
@@ -106,5 +128,14 @@ const styles = StyleSheet.create({
     fontSize: 8,
     lineHeight: 8,
     fontFamily: 'Ubuntu-Regular',
-  }
+  },
+  startWord: {
+    color: "#4ECDC4", // Red color for "Start"
+  },
+  newWord: {
+    color: "#FFE66D", // Teal color for "new"
+  },
+  sessionWord: {
+    color: "#4ECDC4", // Yellow color for "session"
+  },
 });
