@@ -184,17 +184,11 @@ const styles = StyleSheet.create({
   buttonContainer: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 4,
   },
   buttonPressed: {
-    backgroundColor: 'rgba(78, 205, 196, 0.1)',
-    transform: [{ scale: 0.98 }],
+    opacity: 0.7,
   },
-  promptText: {
-    color: '#737373',
-    fontFamily: 'Ubuntu-Regular',
-  },
-  cursor: {
+  arrow: {
     color: '#4ECDC4',
     fontFamily: 'Ubuntu-Regular',
   },
